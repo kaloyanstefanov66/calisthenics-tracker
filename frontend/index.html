@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<div id="landing-screen" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; width: 100%;">
+    <h1 style="font-size: 5rem; margin-bottom: 10px; font-weight: 900; letter-spacing: 6px; color: #fff; margin-top: 0;">APEX</h1>
+    <p style="color: #888; font-size: 1.1rem; margin-bottom: 40px; letter-spacing: 2px;">YOUR #1 TRACKING APP. NO SIGN IN REQUIRED.</p>
+    <button id="start-tracking-btn" style="background: #fff; color: #121215; border: none; padding: 18px 45px; font-size: 1.1rem; font-weight: 800; cursor: pointer; border-radius: 4px; letter-spacing: 1px;">START TRACKING</button>
+</div>
+    <div id="auth-wrapper" class="full-screen-bg">
+        <div id="auth-container" class="glass-card">
+            <h2 id="auth-title">SIGN IN</h2>
+            
+            <form id="auth-form">
+                <div style="width: 100%; display: flex; justify-content: center; margin-top: 10px; margin-bottom: 25px;">
+    <div id="g_id_onload"
+         data-client_id="973150383186-q3djr1d8ncj0eit5u8t8jlo9rnnj4cdd.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleGoogleLogin"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-shape="rectangular"
+         data-theme="filled_black"
+         data-text="signin_with"
+         data-size="large"
+         data-logo_alignment="left">
+    </div>
+</div>
+                <div id="email-group" class="input-group hidden">
+                    <input type="email" id="auth-email" placeholder="EMAIL ADDRESS">
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="auth-username" placeholder="USERNAME" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="auth-password" placeholder="PASSWORD" required>
+                </div>
+
+                <button type="submit" id="auth-btn" class="btn btn-primary">ENTER</button>
+            </form>
+
+            <p class="toggle-text">
+                <span id="auth-toggle-msg">NEW HERE?</span> 
+                <a href="#" id="auth-toggle-link">CREATE ACCOUNT</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="selection-screen" class="hidden">
+        <div class="split left" data-target="calisthenics-page">
+            <div class="split-content">
+                <h2>CALISTHENICS</h2>
+                <p>MASTER YOUR BODY</p>
+            </div>
+        </div>
+        <div class="split right" data-target="gym-page">
+            <div class="split-content">
+                <h2>FREE WEIGHTS</h2>
+                <p>HEAVY IRON</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden">
+        <header class="navbar">
+            <div class="logo" id="home-logo">T R A C K E R</div>
+            <nav class="nav-tabs">
+                <button class="tab-btn" data-tab="calisthenics-page">CALISTHENICS</button>
+                <button class="tab-btn" data-tab="gym-page">GYM</button>
+                <button class="tab-btn" data-tab="history-page">HISTORY</button>
+                <button class="tab-btn hidden" id="admin-nav-btn" data-tab="admin-page" style="color: #e53e3e;">[ ADMIN PANEL ]</button>
+            </nav>
+            
+            <div class="profile-widget" style="position: relative; display: inline-block;">
+    <button id="profile-btn" style="background: none; border: 1px solid #333; color: #fff; padding: 8px 16px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif;">
+        <span id="profile-name">GUEST</span>
+        <span style="font-size: 10px;">▼</span>
+    </button>
+    
+    <!-- THE HIDDEN MENU -->
+    <div id="profile-dropdown" class="hidden" style="position: absolute; top: 100%; right: 0; background: #121215; border: 1px solid #333; border-top: none; min-width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.5); border-radius: 0 0 4px 4px; z-index: 100;">
+        <button id="logout-btn" style="width: 100%; background: transparent; border: none; color: #ff4444; padding: 12px; cursor: pointer; text-align: left; font-family: 'Montserrat', sans-serif; font-weight: 600;">
+            LOGOUT
+        </button>
+    </div>
+</div>
+        </header>
+
+        <main class="dashboard-content">
+            <section id="calisthenics-page" class="tab-content">
+                <div class="dashboard-header">
+                    <h2>CALISTHENICS</h2>
+                </div>
+                <div class="tracker-layout">
+                    <div class="clean-card">
+                        <form class="workout-form" data-type="Calisthenics">
+                            <div class="custom-dropdown">
+    <div class="dropdown-selected">SELECT EXERCISE...</div>
+    <div class="dropdown-options"></div>
+    <input type="hidden" class="exercise-input" required>
+</div>
+                            <div class="number-inputs">
+                                <input type="number" class="input-sets" min="1" placeholder="SETS" required>
+                                <input type="number" class="input-reps" min="1" placeholder="REPS" required>
+                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="+ KG (OPTIONAL)">
+                            </div>
+                            <button type="submit" class="btn btn-action">LOG SET</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="gym-page" class="tab-content hidden">
+                <div class="dashboard-header gym-header">
+                    <h2>GYM</h2>
+                </div>
+                <div class="tracker-layout">
+                    <div class="clean-card">
+                        <form class="workout-form" data-type="Gym">
+                            <div class="custom-dropdown">
+    <div class="dropdown-selected">SELECT EXERCISE...</div>
+    <div class="dropdown-options"></div>
+    <input type="hidden" class="exercise-input" required>
+</div>
+                            <div class="number-inputs">
+                                <input type="number" class="input-sets" min="1" placeholder="SETS" required>
+                                <input type="number" class="input-reps" min="1" placeholder="REPS" required>
+                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="WEIGHT (KG)" required>
+                            </div>
+                            <button type="submit" class="btn btn-action">LOG SET</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+          <section id="history-page" class="tab-content hidden">
+                <div class="dashboard-header history-header">
+                    <h2>TRAINING LOG</h2>
+                </div>
+                <div class="table-wrapper" style="margin-bottom: 0;">
+                    <div class="clean-card" style="max-width: 100%; height: 350px; margin-bottom: 30px;">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="table-wrapper" style="margin-top: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>EXERCISE</th>
+                                <th>TYPE</th>
+                                <th>SETS</th>
+                                <th>REPS</th>
+                                <th>WEIGHT</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body"></tbody>
+                    </table>
+                </div>
+            </section> <section id="admin-page" class="tab-content hidden">
+                <div class="dashboard-header" style="background: none; border-bottom: 1px solid #333; height: 15vh;">
+                    <h2 style="color: #e53e3e;">DATABASE OVERRIDE</h2>
+                </div>
+                <div class="tracker-layout" style="margin-top: 40px;">
+                    <div class="clean-card" style="border-color: #e53e3e;">
+                        <h3 style="margin-bottom: 20px; font-size: 14px; letter-spacing: 2px; color: #aaa;">INJECT NEW EXERCISE</h3>
+                        <form id="admin-exercise-form">
+                            <div class="number-inputs">
+                                <input type="text" id="admin-ex-name" placeholder="EXERCISE NAME" required>
+                                <input type="text" id="admin-ex-category" placeholder="TARGET MUSCLE" required>
+                            </div>
+                            <div class="custom-dropdown" style="margin-bottom: 20px;">
+                                <select id="admin-ex-type" style="background: rgba(0,0,0,0.5); padding: 15px; width: 100%; border: none; border-bottom: 2px solid #333; color: #fff; outline: none;">
+                                    <option value="Calisthenics">CALISTHENICS</option>
+                                    <option value="Gym">GYM</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-action delete-danger" style="width: 100%;">AUTHORIZE & INJECT</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+    
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="glass-card modal-card">
+            <h3>DELETE SET?</h3>
+            <p>This action cannot be undone. Are you sure you want to wipe this from your history?</p>
+            <div class="modal-actions">
+                <button id="modal-cancel-btn" class="btn btn-outline">CANCEL</button>
+                <button id="modal-confirm-btn" class="btn btn-action delete-danger">DELETE</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="app.js"></script>
+</body>
+</html>
