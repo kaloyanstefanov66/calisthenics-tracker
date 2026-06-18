@@ -508,3 +508,116 @@ tr:hover td { color: #aaa; }
     background: #ff4a4a;
     color: #fff;
 }
+
+/* ==========================================================================
+/* ==========================================================================
+   MOBILE RESPONSIVE OVERRIDES  
+   ========================================================================== */
+@media (max-width: 768px) {
+    
+    /* 1. NATIVE APP LOCKDOWN */
+    html, body {
+        width: 100%;
+        height: 100dvh; /* Dynamic Viewport Height defeats the mobile address bar jump */
+        overflow: hidden !important; /* Kills global page-level scrolling entirely */
+        position: fixed; /* Stops the iOS/Android elastic overscroll bounce */
+        margin: 0;
+        padding: 0;
+    }
+
+    /* 2. FULL SCREEN WRAPPERS */
+    #landing-screen, #selection-screen, #auth-wrapper {
+        height: 100dvh !important;
+        width: 100vw !important;
+        overflow: hidden !important;
+    }
+
+    /* 3. APP DASHBOARD SCROLL LOGIC */
+    #app-container {
+        height: 100dvh !important;
+        width: 100vw !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .dashboard-content {
+        flex-grow: 1; /* Takes up all remaining space below the navbar */
+        overflow-y: auto !important; /* Re-enables scrolling ONLY inside your content area */
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch; /* Buttery smooth scrolling for mobile */
+        padding-bottom: 40px; /* Safe space for the bottom of the screen */
+    }
+
+  /* 4. S24 SPLIT SCREEN FIT */
+    #selection-screen {
+        /* Removed the display attribute entirely so .hidden can do its job peacefully */
+        flex-direction: row !important; 
+    }
+    
+    .split {
+        position: relative !important;
+        left: auto !important;
+        right: auto !important;
+        width: 50% !important;
+        height: 100dvh !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    .split-content h2 {
+        font-size: 1rem !important; 
+        letter-spacing: 0.5px !important;
+        text-align: center;
+        margin: 0 0 5px 0;
+    }
+    .split-content p {
+        font-size: 0.6rem !important;
+        letter-spacing: 1px !important;
+        text-align: center;
+        margin: 0;
+    }
+
+    /* 5. NAVBAR COMPACT FIT */
+    .navbar {
+        flex-direction: column;
+        padding: 10px;
+        gap: 8px;
+        flex-shrink: 0; /* Prevents the navbar from collapsing */
+    }
+    .nav-tabs {
+        width: 100%;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 4px;
+    }
+    .tab-btn {
+        padding: 8px 10px;
+        font-size: 10px;
+        white-space: nowrap; /* Stops text from wrapping to a second line */
+    }
+
+    /* 6. INPUT AND TABLE FITS */
+    .tracker-layout {
+        padding: 10px;
+        margin-top: 10px;
+    }
+    .number-inputs {
+        flex-direction: column; /* Stacks inputs vertically */
+        gap: 10px;
+    }
+    .number-inputs input {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+    .table-wrapper {
+        overflow-x: auto;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+    table {
+        min-width: 400px; /* Slightly reduced to fit mobile screens better */
+    }
+}

@@ -1,1 +1,10 @@
-backend/.env 
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Secrets and Local Configurations
+.env
+__pycache__/
+*.pyc
+.DS_Store
