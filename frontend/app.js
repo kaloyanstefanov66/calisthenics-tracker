@@ -1,6 +1,6 @@
 const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:8000" 
-    : "https://your-future-backend-url.onrender.com"; // will update this exact string later!
+   ? "http://localhost:8000" 
+   : "https://calisthenics-tracker-ebon.vercel.app"; // 
 let isLoggedIn = localStorage.getItem("is_logged_in") === "true"; 
 
 // ---- DOM ELEMENTS ----
