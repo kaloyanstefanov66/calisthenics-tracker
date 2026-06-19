@@ -165,7 +165,7 @@ def login_user(
         max_age=7776000,      # 90 days
         expires=7776000,      
         samesite="lax",      
-        secure=False          
+        secure=True          
     )
 
     return {
@@ -216,7 +216,7 @@ def google_auth(
             max_age=7776000,      # 90 days
             expires=7776000,      
             samesite="lax",      
-            secure=False          
+            secure=True          
         )
         
         return {
