@@ -6,7 +6,7 @@
     <title>APEX</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -15,44 +15,46 @@
     <p style="color: #888; font-size: 1.1rem; margin-bottom: 40px; letter-spacing: 2px;">YOUR #1 TRACKING APP. NO SIGN IN REQUIRED.</p>
     <button id="start-tracking-btn" style="background: #fff; color: #121215; border: none; padding: 18px 45px; font-size: 1.1rem; font-weight: 800; cursor: pointer; border-radius: 4px; letter-spacing: 1px;">START TRACKING</button>
 </div>
+
     <div id="auth-wrapper" class="full-screen-bg">
         <div id="auth-container" class="glass-card">
             <h2 id="auth-title">SIGN IN</h2>
-            
-            <form id="auth-form">
+
+            <form id="auth-form" autocomplete="off">
                 <div style="width: 100%; display: flex; justify-content: center; margin-top: 10px; margin-bottom: 25px;">
-    <div id="g_id_onload"
-         data-client_id="973150383186-q3djr1d8ncj0eit5u8t8jlo9rnnj4cdd.apps.googleusercontent.com"
-         data-ux_mode="popup"
-         data-callback="handleGoogleLogin"
-         data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-         data-type="standard"
-         data-shape="rectangular"
-         data-theme="filled_black"
-         data-text="signin_with"
-         data-size="large"
-         data-logo_alignment="left">
-    </div>
-</div>
+                    <div id="g_id_onload"
+                         data-client_id="973150383186-q3djr1d8ncj0eit5u8t8jlo9rnnj4cdd.apps.googleusercontent.com"
+                         data-ux_mode="popup"
+                         data-callback="handleGoogleLogin"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="filled_black"
+                         data-text="signin_with"
+                         data-size="large"
+                         data-logo_alignment="left">
+                    </div>
+                </div>
+
                 <div id="email-group" class="input-group hidden">
-                    <input type="email" id="auth-email" placeholder="EMAIL ADDRESS">
+                    <input type="email" id="auth-email" placeholder="EMAIL ADDRESS" autocomplete="off">
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="auth-username" placeholder="USERNAME" required>
+                    <input type="text" id="auth-username" placeholder="USERNAME" autocomplete="off" required>
                 </div>
 
                 <div class="input-group">
-                    <input type="password" id="auth-password" placeholder="PASSWORD" required>
+                    <input type="password" id="auth-password" placeholder="PASSWORD" autocomplete="current-password" required>
                 </div>
 
                 <button type="submit" id="auth-btn" class="btn btn-primary">ENTER</button>
             </form>
 
             <p class="toggle-text">
-                <span id="auth-toggle-msg">NEW HERE?</span> 
+                <span id="auth-toggle-msg">NEW HERE?</span>
                 <a href="#" id="auth-toggle-link">CREATE ACCOUNT</a>
             </p>
         </div>
@@ -82,20 +84,18 @@
                 <button class="tab-btn" data-tab="history-page">HISTORY</button>
                 <button class="tab-btn hidden" id="admin-nav-btn" data-tab="admin-page" style="color: #e53e3e;">[ ADMIN PANEL ]</button>
             </nav>
-            
+
             <div class="profile-widget" style="position: relative; display: inline-block;">
-    <button id="profile-btn" style="background: none; border: 1px solid #333; color: #fff; padding: 8px 16px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif;">
-        <span id="profile-name">GUEST</span>
-        <span style="font-size: 10px;">▼</span>
-    </button>
-    
-    <!-- THE HIDDEN MENU -->
-    <div id="profile-dropdown" class="hidden" style="position: absolute; top: 100%; right: 0; background: #121215; border: 1px solid #333; border-top: none; min-width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.5); border-radius: 0 0 4px 4px; z-index: 100;">
-        <button id="logout-btn" style="width: 100%; background: transparent; border: none; color: #ff4444; padding: 12px; cursor: pointer; text-align: left; font-family: 'Montserrat', sans-serif; font-weight: 600;">
-            LOGOUT
-        </button>
-    </div>
-</div>
+                <button id="profile-btn" style="background: none; border: 1px solid #333; color: #fff; padding: 8px 16px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif;">
+                    <span id="profile-name">GUEST</span>
+                    <span style="font-size: 10px;">▼</span>
+                </button>
+                <div id="profile-dropdown" class="hidden" style="position: absolute; top: 100%; right: 0; background: #121215; border: 1px solid #333; border-top: none; min-width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.5); border-radius: 0 0 4px 4px; z-index: 100;">
+                    <button id="logout-btn" style="width: 100%; background: transparent; border: none; color: #ff4444; padding: 12px; cursor: pointer; text-align: left; font-family: 'Montserrat', sans-serif; font-weight: 600;">
+                        LOGOUT
+                    </button>
+                </div>
+            </div>
         </header>
 
         <main class="dashboard-content">
@@ -105,16 +105,17 @@
                 </div>
                 <div class="tracker-layout">
                     <div class="clean-card">
-                        <form class="workout-form" data-type="Calisthenics">
+                        <form class="workout-form" data-type="Calisthenics" autocomplete="off">
                             <div class="custom-dropdown">
-    <div class="dropdown-selected">SELECT EXERCISE...</div>
-    <div class="dropdown-options"></div>
-    <input type="hidden" class="exercise-input" required>
-</div>
+                                <div class="dropdown-selected">SELECT EXERCISE...</div>
+                                <div class="dropdown-options"></div>
+                                <input type="hidden" class="exercise-input">
+                            </div>
                             <div class="number-inputs">
-                                <input type="number" class="input-sets" min="1" placeholder="SETS" required>
-                                <input type="number" class="input-reps" min="1" placeholder="REPS" required>
-                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="+ KG (OPTIONAL)">
+                                <!-- FIX #6: autocomplete="off" on all number inputs -->
+                                <input type="number" class="input-sets" min="1" placeholder="SETS" autocomplete="off" required>
+                                <input type="number" class="input-reps" min="1" placeholder="REPS" autocomplete="off" required>
+                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="+ KG (OPTIONAL)" autocomplete="off">
                             </div>
                             <button type="submit" class="btn btn-action">LOG SET</button>
                         </form>
@@ -128,16 +129,17 @@
                 </div>
                 <div class="tracker-layout">
                     <div class="clean-card">
-                        <form class="workout-form" data-type="Gym">
+                        <form class="workout-form" data-type="Gym" autocomplete="off">
                             <div class="custom-dropdown">
-    <div class="dropdown-selected">SELECT EXERCISE...</div>
-    <div class="dropdown-options"></div>
-    <input type="hidden" class="exercise-input" required>
-</div>
+                                <div class="dropdown-selected">SELECT EXERCISE...</div>
+                                <div class="dropdown-options"></div>
+                                <input type="hidden" class="exercise-input">
+                            </div>
                             <div class="number-inputs">
-                                <input type="number" class="input-sets" min="1" placeholder="SETS" required>
-                                <input type="number" class="input-reps" min="1" placeholder="REPS" required>
-                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="WEIGHT (KG)" required>
+                                <!-- FIX #6: autocomplete="off" on all number inputs -->
+                                <input type="number" class="input-sets" min="1" placeholder="SETS" autocomplete="off" required>
+                                <input type="number" class="input-reps" min="1" placeholder="REPS" autocomplete="off" required>
+                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="WEIGHT (KG)" autocomplete="off" required>
                             </div>
                             <button type="submit" class="btn btn-action">LOG SET</button>
                         </form>
@@ -145,7 +147,7 @@
                 </div>
             </section>
 
-          <section id="history-page" class="tab-content hidden">
+            <section id="history-page" class="tab-content hidden">
                 <div class="dashboard-header history-header">
                     <h2>TRAINING LOG</h2>
                 </div>
@@ -171,17 +173,19 @@
                         <tbody id="history-table-body"></tbody>
                     </table>
                 </div>
-            </section> <section id="admin-page" class="tab-content hidden">
+            </section>
+
+            <section id="admin-page" class="tab-content hidden">
                 <div class="dashboard-header" style="background: none; border-bottom: 1px solid #333; height: 15vh;">
                     <h2 style="color: #e53e3e;">DATABASE OVERRIDE</h2>
                 </div>
                 <div class="tracker-layout" style="margin-top: 40px;">
                     <div class="clean-card" style="border-color: #e53e3e;">
                         <h3 style="margin-bottom: 20px; font-size: 14px; letter-spacing: 2px; color: #aaa;">INJECT NEW EXERCISE</h3>
-                        <form id="admin-exercise-form">
+                        <form id="admin-exercise-form" autocomplete="off">
                             <div class="number-inputs">
-                                <input type="text" id="admin-ex-name" placeholder="EXERCISE NAME" required>
-                                <input type="text" id="admin-ex-category" placeholder="TARGET MUSCLE" required>
+                                <input type="text" id="admin-ex-name" placeholder="EXERCISE NAME" autocomplete="off" required>
+                                <input type="text" id="admin-ex-category" placeholder="TARGET MUSCLE" autocomplete="off" required>
                             </div>
                             <div class="custom-dropdown" style="margin-bottom: 20px;">
                                 <select id="admin-ex-type" style="background: rgba(0,0,0,0.5); padding: 15px; width: 100%; border: none; border-bottom: 2px solid #333; color: #fff; outline: none;">
@@ -198,7 +202,7 @@
     </div>
 
     <div id="toast-container"></div>
-    
+
     <div id="confirm-modal" class="modal-overlay hidden">
         <div class="glass-card modal-card">
             <h3>DELETE SET?</h3>
@@ -211,7 +215,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="app.js"></script>
 </body>
 </html>

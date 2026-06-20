@@ -41,6 +41,12 @@ function showToast(message, type = "info") {
     }, 3000);
 }
 
+// ---- FIX #4: FORMAT ISO DATE TO "Jun 14" ----
+function formatDate(dateStr) {
+    // Append time to avoid UTC offset shifting the date by one day
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 // ---- 1. AUTH TOGGLE MECHANISM ----
 authToggleLink.addEventListener("click", (e) => {
     e.preventDefault();
@@ -241,6 +247,19 @@ if (logoutBtn) {
     });
 }
 
+// ---- FIX #5: LAST WEIGHT MEMORY PER EXERCISE ----
+function saveLastWeight(exerciseId, weight) {
+    if (!exerciseId || parseFloat(weight) <= 0) return;
+    const weights = JSON.parse(localStorage.getItem("last_weights") || "{}");
+    weights[exerciseId] = weight;
+    localStorage.setItem("last_weights", JSON.stringify(weights));
+}
+
+function getLastWeight(exerciseId) {
+    const weights = JSON.parse(localStorage.getItem("last_weights") || "{}");
+    return weights[exerciseId] || "";
+}
+
 // ---- 7. DATA LOADING AND LOGGING ----
 async function loadExercises(type) {
     const activeTab = document.querySelector('.tab-content:not(.hidden)');
@@ -248,9 +267,11 @@ async function loadExercises(type) {
     const dropdownOptions = activeTab.querySelector('.dropdown-options');
     const dropdownSelected = activeTab.querySelector('.dropdown-selected');
     const hiddenInput = activeTab.querySelector('.exercise-input');
+    const weightInput = activeTab.querySelector('.input-weight');
     if (!dropdownOptions) return;
 
-    dropdownSelected.innerText = `SELECT ${type.toUpperCase()} EXERCISE...`;
+    // FIX #3: Show loading state in dropdown while API call is in flight
+    dropdownSelected.innerText = `LOADING...`;
     dropdownSelected.classList.remove("has-value");
     if (hiddenInput) hiddenInput.value = "";
 
@@ -258,6 +279,9 @@ async function loadExercises(type) {
         const response = await fetch(`${API_URL}/exercises?type=${type}`, { credentials: "include" });
         if (!response.ok) throw new Error("Could not load exercises");
         const exercises = await response.json();
+
+        // Reset to placeholder after successful load
+        dropdownSelected.innerText = `SELECT ${type.toUpperCase()} EXERCISE...`;
 
         const grouped = {};
         exercises.forEach(ex => {
@@ -270,9 +294,6 @@ async function loadExercises(type) {
         for (const category in grouped) {
             htmlContent += `<div class="dropdown-category-header" style="padding: 8px 12px; color: #666; font-size: 11px; font-weight: 700; background: #16161a; letter-spacing: 1px;">— ${category} —</div>`;
             grouped[category].forEach(ex => {
-                // FIX: store both id (data-value) and name (data-name) so guest logs
-                // don't rely on parsing the label text — was brittle and broke on
-                // already-selected states
                 htmlContent += `<div class="dropdown-option" data-value="${ex.id}" data-name="${ex.name.toUpperCase()}" style="padding-left: 20px;">${ex.name.toUpperCase()}</div>`;
             });
         }
@@ -285,13 +306,18 @@ async function loadExercises(type) {
                 dropdownSelected.innerText = option.innerText;
                 dropdownSelected.classList.add("has-value");
                 hiddenInput.value = option.getAttribute("data-value");
-                // Store the name on the hidden input too so guest logging can read it reliably
                 hiddenInput.dataset.name = option.getAttribute("data-name");
                 dropdownOptions.classList.remove("show");
+
+                // FIX #5: Pre-fill weight input with last used weight for this exercise
+                if (weightInput) {
+                    const lastWeight = getLastWeight(option.getAttribute("data-value"));
+                    weightInput.value = lastWeight;
+                }
             });
         });
     } catch (err) {
-        // FIX: was silently console.error — now shows a toast so the user knows
+        dropdownSelected.innerText = `SELECT ${type.toUpperCase()} EXERCISE...`;
         showToast("Could not load exercises. Check your connection.", "error");
         console.error(err);
     }
@@ -302,15 +328,23 @@ async function loadWorkoutHistory() {
     try {
         let logs = [];
         if (isLoggedIn) {
-            const response = await fetch(`${API_URL}/logs`, { credentials: "include" });
+            // FIX #8: Add ?limit=50 explicitly (avoids loading all rows just for session verify)
+            const response = await fetch(`${API_URL}/logs?limit=50`, { credentials: "include" });
             if (!response.ok) throw new Error("Could not load history");
             logs = await response.json();
         } else {
-            logs = JSON.parse(localStorage.getItem("guest_logs") || "[]").sort((a, b) => b.id - a.id);
+            // FIX #7: Cap guest logs at last 200 entries to avoid localStorage overflow
+            const allGuestLogs = JSON.parse(localStorage.getItem("guest_logs") || "[]");
+            if (allGuestLogs.length > 200) {
+                const trimmed = allGuestLogs.slice(-200);
+                localStorage.setItem("guest_logs", JSON.stringify(trimmed));
+                logs = trimmed.sort((a, b) => b.id - a.id);
+            } else {
+                logs = allGuestLogs.sort((a, b) => b.id - a.id);
+            }
         }
 
         if (logs.length === 0) {
-            // FIX: was empty string — now shows a helpful empty state row
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="7" style="text-align: center; color: #444; padding: 40px 0; font-size: 13px; letter-spacing: 1px;">
@@ -334,7 +368,6 @@ async function loadWorkoutHistory() {
             </tr>
         `).join("");
     } catch (err) {
-        // FIX: was silently console.error
         showToast("Could not load training history.", "error");
         console.error(err);
     }
@@ -405,11 +438,10 @@ async function renderAnalyticsChart() {
             const response = await fetch(`${API_URL}/analytics`, { credentials: "include" });
             if (!response.ok) throw new Error("Could not fetch analytics data");
             const data = await response.json();
-            // Backend now returns a padded 7-day series with 0s for rest days
-            chartLabels = data.labels;
+            // FIX #4: Format ISO dates to "Jun 14" instead of "2026-06-14"
+            chartLabels = data.labels.map(d => formatDate(d));
             chartData = data.volume;
         } else {
-            // Guest: pad 7 calendar days with zeros for rest days
             const guestLogs = JSON.parse(localStorage.getItem("guest_logs") || "[]");
             const volumeMap = {};
             guestLogs.forEach(log => {
@@ -423,7 +455,8 @@ async function renderAnalyticsChart() {
                 const d = new Date(today);
                 d.setDate(today.getDate() - i);
                 const dateStr = d.toISOString().split("T")[0];
-                chartLabels.push(dateStr);
+                // FIX #4: Format guest chart labels too
+                chartLabels.push(formatDate(dateStr));
                 chartData.push(volumeMap[dateStr] || 0);
             }
         }
@@ -474,7 +507,6 @@ async function renderAnalyticsChart() {
             }
         });
     } catch (err) {
-        // FIX: was silently console.error
         showToast("Could not load analytics chart.", "error");
         console.error("Error building Chart.js:", err);
     }
@@ -511,11 +543,9 @@ document.querySelectorAll(".workout-form").forEach(form => {
                 });
                 if (!response.ok) throw new Error("Failed to log set");
             } else {
-                // FIX: read exercise name from data-name attribute on the hidden input
-                // instead of parsing the dropdown label text (was brittle)
                 const exerciseName = exerciseInput.dataset.name || exerciseId;
-                const guestLogs = JSON.parse(localStorage.getItem("guest_logs") || "[]");
-                guestLogs.push({
+                const allGuestLogs = JSON.parse(localStorage.getItem("guest_logs") || "[]");
+                allGuestLogs.push({
                     id: Date.now(),
                     exercise_name: exerciseName,
                     workout_type: defaultType,
@@ -524,17 +554,32 @@ document.querySelectorAll(".workout-form").forEach(form => {
                     weight_added: parseFloat(weightAdded),
                     date: new Date().toISOString()
                 });
-                localStorage.setItem("guest_logs", JSON.stringify(guestLogs));
+                // FIX #7: Enforce 200-entry cap on every write, not just on read
+                if (allGuestLogs.length > 200) allGuestLogs.splice(0, allGuestLogs.length - 200);
+                localStorage.setItem("guest_logs", JSON.stringify(allGuestLogs));
             }
 
+            // FIX #5: Save last used weight for this exercise
+            saveLastWeight(exerciseId, weightAdded);
+
             showToast(isLoggedIn ? "SET LOGGED" : "GUEST SET LOGGED", "success");
+
+            // Reset form but keep exercise selected and weight pre-filled
+            const currentExerciseId = exerciseInput.value;
+            const currentExerciseName = exerciseInput.dataset.name;
+            const currentDropdownText = form.querySelector(".dropdown-selected").innerText;
             form.reset();
 
-            const dropdownSelected = form.querySelector(".dropdown-selected");
-            dropdownSelected.innerText = `SELECT ${defaultType.toUpperCase()} EXERCISE...`;
-            dropdownSelected.classList.remove("has-value");
-            exerciseInput.value = "";
-            exerciseInput.dataset.name = "";
+            // Restore exercise selection state so user can quickly log another set
+            form.querySelector(".dropdown-selected").innerText = currentDropdownText;
+            form.querySelector(".dropdown-selected").classList.add("has-value");
+            exerciseInput.value = currentExerciseId;
+            exerciseInput.dataset.name = currentExerciseName;
+
+            // FIX #5: Re-fill weight with what they just used
+            if (parseFloat(weightAdded) > 0) {
+                form.querySelector(".input-weight").value = weightAdded;
+            }
 
             loadWorkoutHistory();
             renderAnalyticsChart();
@@ -596,9 +641,10 @@ if (startTrackingBtn) {
     });
 }
 
+// FIX #8: Lightweight session verify — only fetch 1 log row instead of 50
 async function verifySession() {
     try {
-        const response = await fetch(`${API_URL}/logs`, { credentials: "include" });
+        const response = await fetch(`${API_URL}/logs?limit=1`, { credentials: "include" });
         if (response.status === 401) {
             localStorage.removeItem("is_logged_in");
             localStorage.removeItem("is_admin");
