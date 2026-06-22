@@ -356,7 +356,7 @@ async function loadWorkoutHistory() {
 
         tableBody.innerHTML = logs.map(log => `
             <tr>
-                <td style="color:#666;">${isLoggedIn ? log.date.split(" ")[0] : log.date.split("T")[0]}</td>
+                <td style="color:#666;">${formatDate(isLoggedIn ? log.date.split(" ")[0] : log.date.split("T")[0])}</td>
                 <td style="color:#fff;">${log.exercise_name.toUpperCase()}</td>
                 <td style="color:#666;">${log.workout_type.toUpperCase()}</td>
                 <td>${log.sets}</td>
