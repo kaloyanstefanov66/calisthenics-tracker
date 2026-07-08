@@ -7,7 +7,7 @@ from pydantic import BaseModel, EmailStr
 import os
 from dotenv import load_dotenv
 
-# Load env vars once at the top — removed duplicate call
+
 load_dotenv()
 
 import database
@@ -40,7 +40,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Detect production so we can set secure=True on cookies only on HTTPS
 IS_PRODUCTION = os.getenv("ENVIRONMENT", "development") == "production"
 
 class AnalyticsResponse(BaseModel):
@@ -83,8 +82,6 @@ def get_current_user(access_token: str = Cookie(None)):
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Could not validate credentials")
 
-# FIX: now uses Cookie via get_current_user (was using oauth2_scheme/Bearer header,
-# which never matched the cookie the frontend sends — admin inject always returned 403)
 def get_admin_user(
     db: Session = Depends(database.get_db),
     current_user_id: int = Depends(get_current_user)
@@ -104,9 +101,7 @@ def get_analytics(
     db: Session = Depends(database.get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-    # FIX: was LIMIT 7 with no date filter — returned the 7 days that had logs,
-    # skipping gaps. Now generates a full 7-day calendar series and LEFT JOINs
-    # actual volume so missing days show as 0 (matching guest chart behaviour).
+  
     query = text("""
         WITH date_series AS (
             SELECT generate_series(
@@ -166,7 +161,7 @@ def login_user(
         raise HTTPException(status_code=401, detail="Invalid credentials")
     access_token = auth.create_access_token(data={"sub": user[1], "user_id": user[0]})
     
-    # 🔥 FIXED: samesite="none" forced for Cross-Domain support
+    
     response.set_cookie(
         key="access_token",
         value=f"Bearer {access_token}",
@@ -211,7 +206,7 @@ def google_auth(
             ).fetchone()
         access_token = auth.create_access_token(data={"sub": user[1], "user_id": user[0]})
         
-        # 🔥 FIXED: samesite="none" forced for Cross-Domain support
+        
         response.set_cookie(
             key="access_token",
             value=f"Bearer {access_token}",
@@ -293,7 +288,7 @@ def get_user_logs(
     db: Session = Depends(database.get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-    # Added LIMIT/OFFSET so large histories don't load everything at once
+    
     query = """
         SELECT wl.id, e.name, e.category, wl.workout_date, wl.sets, wl.reps, wl.weight_added, e.workout_type
         FROM workout_logs wl
