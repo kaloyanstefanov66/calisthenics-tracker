@@ -186,7 +186,7 @@ input:focus, select:focus {
     letter-spacing: 8px;
     margin-bottom: 10px;
     color: transparent;
-    -webkit-text-stroke: 2px #fff; /* Hollow text effect */
+    -webkit-text-stroke: 2px rgba(184, 205, 148, .82); /* Hollow muted-green text */
     transition: all 0.4s ease;
 }
 
@@ -195,8 +195,8 @@ input:focus, select:focus {
     font-weight: 600;
     letter-spacing: 4px;
     color: #d9e1d2;
-    opacity: .9;
-    transform: translateY(0);
+    opacity: 0;
+    transform: translateY(16px);
     transition: all 0.4s ease;
 }
 
@@ -212,13 +212,15 @@ input:focus, select:focus {
 .split:hover .split-content { transform: scale(1.1); } /* Text scales up */
 
 .split:hover .split-content h2 {
-    color: #fff; 
+    color: #c6dca0;
     -webkit-text-stroke: 0px;
 }
 
 .split:hover .split-content p {
     opacity: 1; /* Subtitle fades in and slides up */
-    transform: translateY(0);
+    transform: translateY(-4px) scale(1.12);
+    color: var(--accent);
+    text-shadow: 0 0 18px rgba(158, 184, 108, .45);
 }
 
 /* ---- 3. MAIN DASHBOARD OVERHAUL ---- */
@@ -828,6 +830,7 @@ th { color: #aeb8b1; } td { border-color: #2d3832; }
 .workout-modes { box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
 #profile-btn { box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
 .workout-mode.active { background: rgba(158, 184, 108, .2); color: #d9e6c2; box-shadow: inset 0 0 0 1px rgba(179, 205, 124, .25); }
+.workout-mode:not(.active) { background: transparent !important; color: #aeb8b1; box-shadow: none; }
 .tab-btn.active { color: #c8d9a5; border-bottom-color: #a9c47a; }
 .btn-action { background: #8faa61; border-color: #9db971; color: #10160d; }
 .btn-action:hover { background: var(--accent-strong); border-color: var(--accent-strong); }

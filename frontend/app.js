@@ -243,6 +243,11 @@ function openDashboard(targetPage) {
     const activeSection = document.getElementById(targetPage);
     if (activeTabButton) activeTabButton.classList.add("active");
     if (activeSection) activeSection.classList.remove("hidden");
+    if (targetPage === "calisthenics-page" || targetPage === "gym-page") {
+        document.querySelectorAll('.workout-mode').forEach(mode => {
+            mode.classList.toggle('active', mode.getAttribute('data-tab') === targetPage);
+        });
+    }
     if (targetPage === "calisthenics-page") { loadExercises("Calisthenics"); loadWorkoutHistory(); }
     if (targetPage === "gym-page") { loadExercises("Gym"); loadWorkoutHistory(); }
     if (targetPage === "history-page") {
@@ -256,7 +261,10 @@ tabButtons.forEach(btn => {
 });
 
 document.querySelectorAll('.workout-mode').forEach(btn => {
-    btn.addEventListener('click', () => openDashboard(btn.getAttribute('data-tab')));
+    btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+        openDashboard(targetTab);
+    });
 });
 
 document.querySelectorAll('.rest-start').forEach(button => {
