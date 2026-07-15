@@ -3,16 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEX</title>
+
+    <title>APEX — Calisthenics & Gym Workout Tracker</title>
+    <meta name="description" content="APEX is a free workout tracker for calisthenics and gym training. Log sets, reps and weight, track your training history, and visualize your progress over time.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://calisthenics-tracker-frontend.vercel.app/">
+
+    <!-- Open Graph / Facebook, LinkedIn, Slack, Discord previews -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://calisthenics-tracker-frontend.vercel.app/">
+    <meta property="og:title" content="APEX — Calisthenics & Gym Workout Tracker">
+    <meta property="og:description" content="Log sets, reps and weight for calisthenics and gym workouts, then track your progress with a full training history and volume charts.">
+    <meta property="og:image" content="https://calisthenics-tracker-frontend.vercel.app/og-image.png">
+
+    <!-- Twitter / X card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="APEX — Calisthenics & Gym Workout Tracker">
+    <meta name="twitter:description" content="Log sets, reps and weight for calisthenics and gym workouts, then track your progress with a full training history and volume charts.">
+    <meta name="twitter:image" content="https://calisthenics-tracker-frontend.vercel.app/og-image.png">
+
+    <meta name="theme-color" content="#0a0a0c">
+
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="favicon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="styles.css?v=4">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "APEX",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Web",
+      "description": "A calisthenics and gym workout tracker for logging sets, reps, weight and training history.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
 </head>
 <body>
-<div id="landing-screen" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; width: 100%;">
+<noscript>
+    <div style="padding: 40px; text-align: center; font-family: sans-serif;">
+        APEX is a calisthenics and gym workout tracker. Please enable JavaScript to use the app.
+    </div>
+</noscript>
+<div id="landing-screen" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; width: 100%; padding: 20px;">
     <h1 style="font-size: 5rem; margin-bottom: 10px; font-weight: 900; letter-spacing: 6px; color: #fff; margin-top: 0;">APEX</h1>
-    <p style="color: #888; font-size: 1.1rem; margin-bottom: 40px; letter-spacing: 2px;"></p>
+    <p style="color: #888; font-size: 1.1rem; margin-bottom: 40px; letter-spacing: 2px; max-width: 500px;">TRACK EVERY SET. CALISTHENICS & GYM, ONE LOG.</p>
     <button id="start-tracking-btn" style="background: #fff; color: #121215; border: none; padding: 18px 45px; font-size: 1.1rem; font-weight: 800; cursor: pointer; border-radius: 4px; letter-spacing: 1px;">START TRACKING</button>
 </div>
 

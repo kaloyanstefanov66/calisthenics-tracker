@@ -1,4 +1,4 @@
-/* ---- GLOBAL STYLES & THENX VIBE ---- */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -13,6 +13,39 @@ body {
 }
 
 .hidden { display: none !important; }
+
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* ---- 0. LANDING SCREEN POLISH ---- */
+#landing-screen {
+    background: radial-gradient(circle at 50% 30%, #1a1a1f 0%, #0a0a0c 70%);
+    animation: landing-fade-in 0.6s ease both;
+}
+
+@keyframes landing-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#start-tracking-btn {
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+#start-tracking-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+}
+
+#start-tracking-btn:active {
+    transform: translateY(0);
+}
 
 /* ---- 1. AUTHENTICATION FULL SCREEN ---- */
 #auth-wrapper {
@@ -175,7 +208,7 @@ input:focus, select:focus {
 .split:hover .split-content { transform: scale(1.1); } /* Text scales up */
 
 .split:hover .split-content h2 {
-    color: #fff; /* Fills in the hollow text */
+    color: #fff; 
     -webkit-text-stroke: 0px;
 }
 
@@ -241,7 +274,7 @@ input:focus, select:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Nuked the relative positioning and overflow completely */
+    
 }
 
 .dashboard-header h2 {
@@ -250,7 +283,7 @@ input:focus, select:focus {
     text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 
-/* ---- 2. PURE FULL-SCREEN BLUR (ATTACHED TO TABS) ---- */
+
 .tab-content::before {
     content: '';
     position: fixed; /* Locks to your entire monitor */
@@ -451,7 +484,7 @@ tr:hover td { color: #aaa; }
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85); /* Darkens the rest of the screen */
+    background: rgba(0, 0, 0, 0.85); 
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
@@ -509,18 +542,15 @@ tr:hover td { color: #aaa; }
     color: #fff;
 }
 
-/* ==========================================================================
-/* ==========================================================================
-   MOBILE RESPONSIVE OVERRIDES  
-   ========================================================================== */
+
 @media (max-width: 768px) {
     
     /* 1. NATIVE APP LOCKDOWN */
     html, body {
         width: 100%;
         height: 100dvh; /* Dynamic Viewport Height defeats the mobile address bar jump */
-        overflow: hidden !important; /* Kills global page-level scrolling entirely */
-        position: fixed; /* Stops the iOS/Android elastic overscroll bounce */
+        overflow: hidden !important; 
+        position: fixed; 
         margin: 0;
         padding: 0;
     }
@@ -542,15 +572,15 @@ tr:hover td { color: #aaa; }
     }
     .dashboard-content {
         flex-grow: 1; /* Takes up all remaining space below the navbar */
-        overflow-y: auto !important; /* Re-enables scrolling ONLY inside your content area */
+        overflow-y: auto !important; 
         overflow-x: hidden;
-        -webkit-overflow-scrolling: touch; /* Buttery smooth scrolling for mobile */
-        padding-bottom: 40px; /* Safe space for the bottom of the screen */
+        -webkit-overflow-scrolling: touch; 
+        padding-bottom: 40px; 
     }
 
-  /* 4. S24 SPLIT SCREEN FIT */
+ 
     #selection-screen {
-        /* Removed the display attribute entirely so .hidden can do its job peacefully */
+        
         flex-direction: row !important; 
     }
     
