@@ -26,6 +26,49 @@ a:focus-visible {
 }
 
 /* ---- 0. LANDING SCREEN POLISH ---- */
+.landing-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+    text-align: center;
+    width: 100%;
+    padding: 24px 20px;
+}
+
+.landing-title {
+    font-size: clamp(2.75rem, 14vw, 5rem);
+    margin: 0 0 10px;
+    font-weight: 900;
+    letter-spacing: clamp(3px, 1.5vw, 6px);
+    color: #fff;
+}
+
+.landing-tagline {
+    color: #a8adb8;
+    font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+    margin-bottom: 36px;
+    letter-spacing: 1px;
+    max-width: 500px;
+    line-height: 1.5;
+    padding: 0 8px;
+}
+
+.landing-cta {
+    background: #b8ff4d;
+    color: #10130b;
+    border: none;
+    padding: 16px 36px;
+    font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+    font-weight: 800;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    width: min(100%, 320px);
+}
+
 #landing-screen {
     background: radial-gradient(circle at 50% 30%, #1a1a1f 0%, #0a0a0c 70%);
     animation: landing-fade-in 0.6s ease both;
@@ -550,111 +593,305 @@ tr:hover td { color: #aaa; }
 
 
 @media (max-width: 768px) {
-    
-    /* 1. NATIVE APP LOCKDOWN */
     html, body {
+        overflow-x: hidden;
+        min-height: 100dvh;
+    }
+
+    #landing-screen,
+    #selection-screen,
+    #auth-wrapper {
+        height: 100dvh;
+        min-height: 100dvh;
         width: 100%;
-        height: 100dvh; /* Dynamic Viewport Height defeats the mobile address bar jump */
-        overflow: hidden !important; 
-        position: fixed; 
-        margin: 0;
-        padding: 0;
     }
 
-    /* 2. FULL SCREEN WRAPPERS */
-    #landing-screen, #selection-screen, #auth-wrapper {
-        height: 100dvh !important;
-        width: 100vw !important;
-        overflow: hidden !important;
+    #auth-wrapper {
+        padding: 16px;
+        box-sizing: border-box;
     }
 
-    /* 3. APP DASHBOARD SCROLL LOGIC */
+    .glass-card {
+        padding: 32px 22px;
+        max-width: 100%;
+    }
+
     #app-container {
-        height: 100dvh !important;
-        width: 100vw !important;
+        min-height: 100dvh;
+        height: 100dvh;
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        padding-top: 0;
     }
+
     .dashboard-content {
-        flex-grow: 1; /* Takes up all remaining space below the navbar */
-        overflow-y: auto !important; 
+        flex: 1;
+        overflow-y: auto;
         overflow-x: hidden;
-        -webkit-overflow-scrolling: touch; 
-        padding-bottom: 40px; 
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
     }
 
- 
+    /* Selection screen: stack vertically on phones */
     #selection-screen {
-        
-        flex-direction: row !important; 
-    }
-    
-    .split {
-        position: relative !important;
-        left: auto !important;
-        right: auto !important;
-        width: 50% !important;
-        height: 100dvh !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-        box-sizing: border-box;
-    }
-    .split-content h2 {
-        font-size: 1rem !important; 
-        letter-spacing: 0.5px !important;
-        text-align: center;
-        margin: 0 0 5px 0;
-    }
-    .split-content p {
-        font-size: 0.6rem !important;
-        letter-spacing: 1px !important;
-        text-align: center;
-        margin: 0;
+        flex-direction: column;
     }
 
-    /* 5. NAVBAR COMPACT FIT */
-    .navbar {
-        flex-direction: column;
-        padding: 10px;
-        gap: 8px;
-        flex-shrink: 0; /* Prevents the navbar from collapsing */
+    .split {
+        flex: 1;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        padding: 20px 16px;
     }
+
+    .split:hover {
+        flex: 1;
+    }
+
+    .split-content h2 {
+        font-size: clamp(1.35rem, 7vw, 2rem);
+        letter-spacing: clamp(2px, 1vw, 5px);
+    }
+
+    .split-content p {
+        opacity: 1;
+        transform: none;
+        font-size: 0.65rem;
+        letter-spacing: 2px;
+    }
+
+    .split-cta {
+        margin-top: 18px;
+        font-size: 10px;
+        padding: 10px 14px;
+    }
+
+    /* Navbar: logo + profile on top, tabs full-width below */
+    .navbar {
+        position: sticky;
+        top: 0;
+        height: auto;
+        min-height: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 10px 14px 0;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .logo {
+        flex: 1;
+        font-size: 15px;
+        letter-spacing: 3px;
+    }
+
+    .profile-widget {
+        flex-shrink: 0;
+    }
+
     .nav-tabs {
         width: 100%;
+        order: 3;
         display: flex;
-        flex-wrap: nowrap;
-        justify-content: center;
-        gap: 4px;
-    }
-    .tab-btn {
-        padding: 8px 10px;
-        font-size: 10px;
-        white-space: nowrap; /* Stops text from wrapping to a second line */
+        justify-content: stretch;
+        gap: 0;
+        height: auto;
+        padding: 8px 0 10px;
+        margin-top: 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* 6. INPUT AND TABLE FITS */
-    .tracker-layout {
-        padding: 10px;
-        margin-top: 10px;
+    .tab-btn {
+        flex: 1;
+        justify-content: center;
+        height: auto;
+        min-height: 36px;
+        padding: 8px 4px;
+        font-size: 10px;
+        letter-spacing: 1.2px;
+        white-space: nowrap;
     }
-    .number-inputs {
-        flex-direction: column; /* Stacks inputs vertically */
-        gap: 10px;
+
+    #profile-btn {
+        min-height: 34px;
+        padding: 0 10px !important;
+        font-size: 11px;
     }
-    .number-inputs input {
-        width: 100% !important;
-        box-sizing: border-box;
+
+    .workout-header {
+        min-height: 0;
+        padding: 28px 16px 18px;
+        display: block;
     }
-    .table-wrapper {
-        overflow-x: auto;
+
+    .workout-header h2,
+    .dashboard-header h2 {
+        font-size: clamp(1.75rem, 8vw, 2.25rem);
+        letter-spacing: -1px;
+    }
+
+    .header-copy {
+        font-size: 13px;
+    }
+
+    .workout-modes {
+        margin-top: 18px;
         width: 100%;
-        -webkit-overflow-scrolling: touch;
+        display: flex;
     }
-    table {
-        min-width: 400px; /* Slightly reduced to fit mobile screens better */
+
+    .workout-mode {
+        flex: 1;
+        justify-content: center;
+        padding: 0 8px;
+        min-height: 40px;
+    }
+
+    .workout-grid {
+        display: flex;
+        flex-direction: column;
+        padding: 0 14px 32px;
+        gap: 12px;
+    }
+
+    .clean-card,
+    .session-context {
+        padding: 20px 18px;
+    }
+
+    .number-inputs {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .number-inputs input {
+        height: 50px;
+    }
+
+    .rest-timer {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .rest-start {
+        flex-shrink: 0;
+    }
+
+    .dashboard-header {
+        min-height: 0;
+        height: auto;
+        padding: 28px 16px 18px;
+    }
+
+    .dashboard-header.history-header {
+        padding-bottom: 12px;
+    }
+
+    .table-wrapper {
+        padding: 0 14px;
+        margin: 16px auto;
+        overflow: visible;
+    }
+
+    .table-wrapper .clean-card {
+        height: 260px !important;
+        margin-bottom: 18px !important;
+        padding: 16px;
+    }
+
+    .table-wrapper thead {
+        display: none;
+    }
+
+    .table-wrapper table,
+    .table-wrapper tbody,
+    .table-wrapper tr,
+    .table-wrapper td {
+        display: block;
+        width: 100%;
+    }
+
+    .table-wrapper tr {
+        position: relative;
+        background: rgba(20, 26, 24, 0.93);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+    }
+
+    .table-wrapper td {
+        border: 0;
+        padding: 5px 34px 5px 0;
+        font-size: 13px;
+    }
+
+    .table-wrapper td::before {
+        content: attr(data-label);
+        display: inline-block;
+        width: 76px;
+        color: var(--muted);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .table-wrapper td:last-child {
+        position: absolute;
+        right: 6px;
+        top: 8px;
+        padding: 0;
+    }
+
+    .table-wrapper td:last-child::before {
+        display: none;
+    }
+
+    .table-wrapper td:nth-child(6)::before {
+        content: "WEIGHT";
+    }
+
+    .tracker-layout {
+        padding: 0 14px;
+        margin-top: 16px;
+    }
+
+    #toast-container {
+        left: 14px;
+        right: 14px;
+        bottom: max(14px, env(safe-area-inset-bottom));
+    }
+
+    .toast {
+        transform: translateY(120%);
+    }
+
+    .toast.show {
+        transform: translateY(0);
+    }
+
+    .modal-card {
+        margin: 0 16px;
+        max-width: calc(100% - 32px);
+        padding: 28px 22px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .modal-actions .btn {
+        width: 100%;
+    }
+
+    #calisthenics-page,
+    #gym-page {
+        background-attachment: scroll;
     }
 }
 
@@ -692,26 +929,6 @@ tr:hover td { color: #aaa; }
 .exercise-search { position: sticky; top: 0; z-index: 1; border: 0; border-bottom: 1px solid var(--line); background: #141a18; padding: 14px 16px; font-size: 12px; }
 input:focus, select:focus { border-bottom-color: var(--accent); }
 button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline-color: var(--accent); }
-
-@media (max-width: 768px) {
-    #app-container { padding-top: 0; }
-    .navbar { flex-direction: row; padding: 11px 14px; gap: 10px; }
-    .nav-tabs { width: auto; gap: 0; }
-    .tab-btn { padding: 8px 7px; }
-    .workout-header { padding: 32px 18px 18px; display: block; }
-    .workout-modes { margin-top: 22px; width: max-content; max-width: 100%; }
-    .workout-grid { display: flex; flex-direction: column; padding: 0 12px 34px; gap: 12px; }
-    .clean-card, .session-context { padding: 22px; }
-    .table-wrapper { padding: 0 14px; overflow: visible; }
-    .table-wrapper thead { display: none; }
-    .table-wrapper table, .table-wrapper tbody, .table-wrapper tr, .table-wrapper td { display: block; width: 100%; }
-    .table-wrapper tr { position: relative; background: rgba(20,26,24,.93); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; }
-    .table-wrapper td { border: 0; padding: 5px 34px 5px 0; font-size: 13px; }
-    .table-wrapper td::before { content: attr(data-label); display: inline-block; width: 76px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: 1px; }
-    .table-wrapper td:last-child { position: absolute; right: 6px; top: 8px; padding: 0; }
-    .table-wrapper td:last-child::before { display: none; }
-    .table-wrapper td:nth-child(6)::before { content: "WEIGHT"; }
-}
 
 /* ---- 7. DESKTOP LAYOUT RESET ---- */
 #app-container { min-height: 100vh; background: #101413; }
@@ -788,19 +1005,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .table-wrapper .clean-card { background: #171d1a; }
 th { color: #aeb8b1; } td { border-color: #2d3832; }
 
-@media (max-width: 768px) {
-    #app-container { min-height: 100dvh; }
-    .navbar { height: 62px; display: flex; justify-content: space-between; padding: 0 16px; }
-    .logo { font-size: 16px; letter-spacing: 3px; }
-    .nav-tabs { gap: 16px; }
-    .tab-btn { font-size: 10px; }
-    #profile-btn { min-height: 34px; padding: 0 10px !important; }
-    .workout-header { min-height: 0; padding: 38px 18px 26px; }
-    .workout-grid { padding: 0 14px 38px; }
-    .number-inputs { grid-template-columns: 1fr; gap: 12px; }
-    .number-inputs input { height: 50px; }
-}
-
 /* ---- 8. SUBTLE LIQUID GLASS + WORKOUT ATMOSPHERE ---- */
 #calisthenics-page, #gym-page {
     background:
@@ -838,6 +1042,141 @@ th { color: #aeb8b1; } td { border-color: #2d3832; }
 .dropdown-selected:hover, .dropdown-selected:focus, .number-inputs input:focus { border-color: rgba(179, 205, 124, .72); background: rgba(11, 18, 14, .7); }
 .rest-start:hover { background: rgba(158, 184, 108, .14); color: #d9e6c2; border-color: rgba(179, 205, 124, .55); }
 
+/* ---- 9. MOBILE OVERRIDES (must follow desktop rules) ---- */
 @media (max-width: 768px) {
-    #calisthenics-page, #gym-page { background-attachment: scroll; }
+    #app-container {
+        min-height: 100dvh;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding-top: 0;
+    }
+
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 10px 14px 0;
+        gap: 8px;
+    }
+
+    .logo {
+        flex: 1;
+        font-size: 15px;
+        letter-spacing: 3px;
+        align-self: auto;
+    }
+
+    .profile-widget {
+        justify-self: auto;
+    }
+
+    .nav-tabs {
+        width: 100%;
+        order: 3;
+        height: auto;
+        gap: 0;
+        align-items: stretch;
+        padding: 8px 0 10px;
+        margin-top: 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn {
+        flex: 1;
+        justify-content: center;
+        height: auto;
+        min-height: 36px;
+        padding: 8px 4px;
+        font-size: 10px;
+    }
+
+    .dashboard-content {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-content {
+        min-height: 0;
+    }
+
+    .workout-header {
+        min-height: 0;
+        display: block;
+        padding: 28px 16px 18px;
+    }
+
+    .workout-header h2,
+    .dashboard-header h2 {
+        font-size: clamp(1.75rem, 8vw, 2.25rem);
+        letter-spacing: -1px;
+    }
+
+    .workout-modes {
+        display: flex;
+        width: 100%;
+        margin-top: 18px;
+        min-height: 44px;
+    }
+
+    .workout-mode {
+        flex: 1;
+        padding: 0 8px;
+    }
+
+    .workout-grid {
+        display: flex;
+        flex-direction: column;
+        padding: 0 14px 32px;
+        gap: 12px;
+    }
+
+    .number-inputs {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .number-inputs input {
+        height: 50px;
+    }
+
+    .rest-timer {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .dashboard-header {
+        min-height: 0;
+        padding: 28px 16px 18px;
+    }
+
+    #selection-screen {
+        flex-direction: column;
+    }
+
+    .split {
+        width: 100%;
+        flex: 1;
+    }
+
+    .split:hover {
+        flex: 1;
+    }
+
+    .split-content h2 {
+        font-size: clamp(1.35rem, 7vw, 2rem);
+        letter-spacing: clamp(2px, 1vw, 5px);
+    }
+
+    .split-content p {
+        opacity: 1;
+        transform: none;
+    }
 }
