@@ -30,7 +30,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=4">
+    <link rel="stylesheet" href="styles.css?v=6">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script type="application/ld+json">
@@ -57,8 +57,8 @@
 </noscript>
 <div id="landing-screen" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; width: 100%; padding: 20px;">
     <h1 style="font-size: 5rem; margin-bottom: 10px; font-weight: 900; letter-spacing: 6px; color: #fff; margin-top: 0;">APEX</h1>
-    <p style="color: #888; font-size: 1.1rem; margin-bottom: 40px; letter-spacing: 2px; max-width: 500px;">TRACK EVERY SET. CALISTHENICS & GYM, ONE LOG.</p>
-    <button id="start-tracking-btn" style="background: #fff; color: #121215; border: none; padding: 18px 45px; font-size: 1.1rem; font-weight: 800; cursor: pointer; border-radius: 4px; letter-spacing: 1px;">START TRACKING</button>
+    <p style="color: #a8adb8; font-size: 1.1rem; margin-bottom: 40px; letter-spacing: 1px; max-width: 500px;">TRACK EVERY SET. CALISTHENICS & GYM, ONE LOG.</p>
+    <button id="start-tracking-btn" style="background: #b8ff4d; color: #10130b; border: none; padding: 18px 45px; font-size: 1.1rem; font-weight: 800; cursor: pointer; border-radius: 4px; letter-spacing: 1px;">START A WORKOUT</button>
 </div>
 
     <div id="auth-wrapper" class="full-screen-bg hidden">
@@ -110,23 +110,24 @@
             <div class="split-content">
                 <h2>CALISTHENICS</h2>
                 <p>MASTER YOUR BODY</p>
+                <span class="split-cta">TAP TO ENTER <span aria-hidden="true">→</span></span>
             </div>
         </div>
         <div class="split right" data-target="gym-page">
             <div class="split-content">
                 <h2>FREE WEIGHTS</h2>
                 <p>HEAVY IRON</p>
+                <span class="split-cta">TAP TO ENTER <span aria-hidden="true">→</span></span>
             </div>
         </div>
     </div>
 
     <div id="app-container" class="hidden">
         <header class="navbar">
-            <div class="logo" id="home-logo">T R A C K E R</div>
+            <div class="logo" id="home-logo">APEX</div>
             <nav class="nav-tabs">
-                <button class="tab-btn" data-tab="calisthenics-page">CALISTHENICS</button>
-                <button class="tab-btn" data-tab="gym-page">GYM</button>
-                <button class="tab-btn" data-tab="history-page">HISTORY</button>
+                <button class="tab-btn" data-tab="calisthenics-page">WORKOUT</button>
+                <button class="tab-btn" data-tab="history-page">PROGRESS</button>
                 <button class="tab-btn hidden" id="admin-nav-btn" data-tab="admin-page" style="color: #e53e3e;">[ ADMIN PANEL ]</button>
             </nav>
 
@@ -145,56 +146,96 @@
 
         <main class="dashboard-content">
             <section id="calisthenics-page" class="tab-content">
-                <div class="dashboard-header">
-                    <h2>CALISTHENICS</h2>
+                <div class="workout-header">
+                    <div>
+                        <p class="eyebrow">TODAY'S SESSION</p>
+                        <h2>Start moving.</h2>
+                        <p class="header-copy">Log your work, one exercise at a time.</p>
+                    </div>
+                    <div class="workout-modes" aria-label="Training type">
+                        <button class="workout-mode active" data-tab="calisthenics-page">CALISTHENICS</button>
+                        <button class="workout-mode" data-tab="gym-page">FREE WEIGHTS</button>
+                    </div>
                 </div>
-                <div class="tracker-layout">
+                <div class="workout-grid">
                     <div class="clean-card">
                         <form class="workout-form" data-type="Calisthenics" autocomplete="off">
                             <div class="custom-dropdown">
-                                <div class="dropdown-selected">SELECT EXERCISE...</div>
+                                <label class="sr-only" for="calisthenics-exercise">Exercise</label>
+                                <div id="calisthenics-exercise" class="dropdown-selected" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">SELECT EXERCISE...</div>
                                 <div class="dropdown-options"></div>
                                 <input type="hidden" class="exercise-input">
                             </div>
                             <div class="number-inputs">
-                                <!-- FIX #6: autocomplete="off" on all number inputs -->
-                                <input type="number" class="input-sets" min="1" placeholder="SETS" autocomplete="off" required>
-                                <input type="number" class="input-reps" min="1" placeholder="REPS" autocomplete="off" required>
-                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="+ KG (OPTIONAL)" autocomplete="off">
+                                <label>SETS<input type="number" class="input-sets" min="1" placeholder="3" autocomplete="off" required></label>
+                                <label>REPS<input type="number" class="input-reps" min="1" placeholder="8" autocomplete="off" required></label>
+                                <label>ADDED KG <span>optional</span><input type="number" class="input-weight" min="0" step="0.1" placeholder="0" autocomplete="off"></label>
                             </div>
-                            <button type="submit" class="btn btn-action">LOG SET</button>
+                            <button type="submit" class="btn btn-action">LOG EXERCISE</button>
+                            <div class="rest-timer" aria-live="polite">
+                                <span>REST TIMER</span><strong class="rest-time">01:30</strong>
+                                <button type="button" class="rest-start">START 90s</button>
+                            </div>
                         </form>
                     </div>
+                    <aside class="session-context" aria-live="polite">
+                        <p class="eyebrow">YOUR MOMENTUM</p>
+                        <div class="stat-list">
+                            <div><span>THIS WEEK</span><strong id="weekly-sets">0 sets</strong></div>
+                            <div><span>CURRENT STREAK</span><strong id="training-streak">0 days</strong></div>
+                            <div><span>LAST LOGGED</span><strong id="last-logged">Start your first session</strong></div>
+                        </div>
+                    </aside>
                 </div>
             </section>
 
             <section id="gym-page" class="tab-content hidden">
-                <div class="dashboard-header gym-header">
-                    <h2>GYM</h2>
+                <div class="workout-header">
+                    <div>
+                        <p class="eyebrow">TODAY'S SESSION</p>
+                        <h2>Move some weight.</h2>
+                        <p class="header-copy">Your recent loads are remembered for you.</p>
+                    </div>
+                    <div class="workout-modes" aria-label="Training type">
+                        <button class="workout-mode" data-tab="calisthenics-page">CALISTHENICS</button>
+                        <button class="workout-mode active" data-tab="gym-page">FREE WEIGHTS</button>
+                    </div>
                 </div>
-                <div class="tracker-layout">
+                <div class="workout-grid">
                     <div class="clean-card">
                         <form class="workout-form" data-type="Gym" autocomplete="off">
                             <div class="custom-dropdown">
-                                <div class="dropdown-selected">SELECT EXERCISE...</div>
+                                <label class="sr-only" for="gym-exercise">Exercise</label>
+                                <div id="gym-exercise" class="dropdown-selected" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">SELECT EXERCISE...</div>
                                 <div class="dropdown-options"></div>
                                 <input type="hidden" class="exercise-input">
                             </div>
                             <div class="number-inputs">
-                                <!-- FIX #6: autocomplete="off" on all number inputs -->
-                                <input type="number" class="input-sets" min="1" placeholder="SETS" autocomplete="off" required>
-                                <input type="number" class="input-reps" min="1" placeholder="REPS" autocomplete="off" required>
-                                <input type="number" class="input-weight" min="0" step="0.1" placeholder="WEIGHT (KG)" autocomplete="off" required>
+                                <label>SETS<input type="number" class="input-sets" min="1" placeholder="3" autocomplete="off" required></label>
+                                <label>REPS<input type="number" class="input-reps" min="1" placeholder="8" autocomplete="off" required></label>
+                                <label>WEIGHT KG<input type="number" class="input-weight" min="0" step="0.1" placeholder="40" autocomplete="off" required></label>
                             </div>
-                            <button type="submit" class="btn btn-action">LOG SET</button>
+                            <button type="submit" class="btn btn-action">LOG EXERCISE</button>
+                            <div class="rest-timer" aria-live="polite">
+                                <span>REST TIMER</span><strong class="rest-time">01:30</strong>
+                                <button type="button" class="rest-start">START 90s</button>
+                            </div>
                         </form>
                     </div>
+                    <aside class="session-context" aria-live="polite">
+                        <p class="eyebrow">YOUR MOMENTUM</p>
+                        <div class="stat-list">
+                            <div><span>THIS WEEK</span><strong class="weekly-sets">0 sets</strong></div>
+                            <div><span>CURRENT STREAK</span><strong class="training-streak">0 days</strong></div>
+                            <div><span>LAST LOGGED</span><strong class="last-logged">Start your first session</strong></div>
+                        </div>
+                    </aside>
                 </div>
             </section>
 
             <section id="history-page" class="tab-content hidden">
                 <div class="dashboard-header history-header">
-                    <h2>TRAINING LOG</h2>
+                    <div><p class="eyebrow">YOUR PROGRESS</p><h2>Training log</h2><p class="header-copy">Volume reflects added external load; bodyweight sessions are tracked separately.</p></div>
                 </div>
                 <div class="table-wrapper" style="margin-bottom: 0;">
                     <div class="clean-card" style="max-width: 100%; height: 350px; margin-bottom: 30px;">

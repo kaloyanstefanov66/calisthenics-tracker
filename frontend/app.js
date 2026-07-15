@@ -47,6 +47,27 @@ function formatDate(dateStr) {
     return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+function renderWorkoutContext(logs) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - 6);
+    const normalizeDate = log => new Date((isLoggedIn ? log.date.split(" ")[0] : log.date.split("T")[0]) + "T00:00:00");
+    const weeklySets = logs.filter(log => normalizeDate(log) >= weekStart).reduce((total, log) => total + Number(log.sets || 0), 0);
+    const uniqueDays = [...new Set(logs.map(log => normalizeDate(log).toDateString()))].map(date => new Date(date)).sort((a, b) => b - a);
+    let streak = 0;
+    const cursor = new Date(today);
+    for (let i = 0; i < 365; i++) {
+        if (uniqueDays.some(date => date.toDateString() === cursor.toDateString())) streak++;
+        else if (i > 0) break;
+        cursor.setDate(cursor.getDate() - 1);
+    }
+    const latest = logs[0];
+    document.querySelectorAll('.weekly-sets, #weekly-sets').forEach(el => el.textContent = `${weeklySets} ${weeklySets === 1 ? 'set' : 'sets'}`);
+    document.querySelectorAll('.training-streak, #training-streak').forEach(el => el.textContent = `${streak} ${streak === 1 ? 'day' : 'days'}`);
+    document.querySelectorAll('.last-logged, #last-logged').forEach(el => el.textContent = latest ? `${latest.exercise_name} · ${formatDate(isLoggedIn ? latest.date.split(" ")[0] : latest.date.split("T")[0])}` : 'Start your first session');
+}
+
 // ---- 1. AUTH TOGGLE MECHANISM ----
 authToggleLink.addEventListener("click", (e) => {
     e.preventDefault();
@@ -99,7 +120,7 @@ authForm.addEventListener("submit", async (e) => {
                 document.getElementById("admin-nav-btn").classList.remove("hidden");
             }
             showToast("Welcome back.", "success");
-            openDashboard("history-page");
+            openDashboard("calisthenics-page");
         } catch (err) {
             showToast(err.message, "error");
         }
@@ -143,7 +164,7 @@ async function handleGoogleLogin(response) {
             document.getElementById("admin-nav-btn").classList.remove("hidden");
         }
         showToast("Welcome back via Google.", "success");
-        openDashboard("history-page");
+        openDashboard("calisthenics-page");
     } catch (err) {
         showToast(err.message, "error");
     }
@@ -169,7 +190,21 @@ document.addEventListener("click", (e) => {
     if (e.target.classList.contains('dropdown-selected')) {
         const menu = e.target.nextElementSibling;
         menu.classList.toggle('show');
+        e.target.setAttribute("aria-expanded", menu.classList.contains("show"));
     }
+});
+
+document.querySelectorAll('.dropdown-selected').forEach(selected => {
+    selected.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selected.click();
+        }
+        if (e.key === 'Escape') {
+            selected.nextElementSibling.classList.remove('show');
+            selected.setAttribute('aria-expanded', 'false');
+        }
+    });
 });
 
 // ---- 3. SPLIT SCREEN SELECTION ----
@@ -191,7 +226,7 @@ window.addEventListener("popstate", (e) => {
         else if (e.state.page === "selection") showSelectionScreen();
         else openDashboard(e.state.page);
     } else {
-        isLoggedIn ? openDashboard("history-page") : showLandingScreen();
+        isLoggedIn ? openDashboard("calisthenics-page") : showLandingScreen();
     }
 });
 
@@ -208,8 +243,8 @@ function openDashboard(targetPage) {
     const activeSection = document.getElementById(targetPage);
     if (activeTabButton) activeTabButton.classList.add("active");
     if (activeSection) activeSection.classList.remove("hidden");
-    if (targetPage === "calisthenics-page") loadExercises("Calisthenics");
-    if (targetPage === "gym-page") loadExercises("Gym");
+    if (targetPage === "calisthenics-page") { loadExercises("Calisthenics"); loadWorkoutHistory(); }
+    if (targetPage === "gym-page") { loadExercises("Gym"); loadWorkoutHistory(); }
     if (targetPage === "history-page") {
         loadWorkoutHistory();
         renderAnalyticsChart();
@@ -218,6 +253,31 @@ function openDashboard(targetPage) {
 
 tabButtons.forEach(btn => {
     btn.addEventListener("click", () => openDashboard(btn.getAttribute("data-tab")));
+});
+
+document.querySelectorAll('.workout-mode').forEach(btn => {
+    btn.addEventListener('click', () => openDashboard(btn.getAttribute('data-tab')));
+});
+
+document.querySelectorAll('.rest-start').forEach(button => {
+    button.addEventListener('click', () => {
+        const timer = button.closest('.rest-timer').querySelector('.rest-time');
+        let remaining = 90;
+        button.disabled = true;
+        button.textContent = 'RESTING';
+        const render = () => { timer.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`; };
+        render();
+        const interval = setInterval(() => {
+            remaining -= 1;
+            render();
+            if (remaining <= 0) {
+                clearInterval(interval);
+                button.disabled = false;
+                button.textContent = 'START 90s';
+                showToast('Rest complete — ready for your next set.', 'success');
+            }
+        }, 1000);
+    });
 });
 
 // ---- 5. LOGOUT / SIGN IN ----
@@ -290,7 +350,7 @@ async function loadExercises(type) {
             grouped[cat].push(ex);
         });
 
-        let htmlContent = "";
+        let htmlContent = `<input class="exercise-search" type="search" placeholder="SEARCH EXERCISES" aria-label="Search exercises">`;
         for (const category in grouped) {
             htmlContent += `<div class="dropdown-category-header" style="padding: 8px 12px; color: #666; font-size: 11px; font-weight: 700; background: #16161a; letter-spacing: 1px;">— ${category} —</div>`;
             grouped[category].forEach(ex => {
@@ -300,6 +360,23 @@ async function loadExercises(type) {
 
         dropdownOptions.innerHTML = htmlContent;
 
+        const searchInput = dropdownOptions.querySelector('.exercise-search');
+        searchInput.addEventListener('click', e => e.stopPropagation());
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim().toUpperCase();
+            dropdownOptions.querySelectorAll('.dropdown-option').forEach(option => {
+                option.hidden = !option.innerText.includes(query);
+            });
+            dropdownOptions.querySelectorAll('.dropdown-category-header').forEach(header => {
+                let next = header.nextElementSibling;
+                let hasVisibleOption = false;
+                while (next && !next.classList.contains('dropdown-category-header')) {
+                    if (next.classList.contains('dropdown-option') && !next.hidden) hasVisibleOption = true;
+                    next = next.nextElementSibling;
+                }
+                header.hidden = !hasVisibleOption;
+            });
+        });
         const options = dropdownOptions.querySelectorAll('.dropdown-option');
         options.forEach(option => {
             option.addEventListener("click", () => {
@@ -308,6 +385,7 @@ async function loadExercises(type) {
                 hiddenInput.value = option.getAttribute("data-value");
                 hiddenInput.dataset.name = option.getAttribute("data-name");
                 dropdownOptions.classList.remove("show");
+                dropdownSelected.setAttribute("aria-expanded", "false");
 
                 // FIX #5: Pre-fill weight input with last used weight for this exercise
                 if (weightInput) {
@@ -344,6 +422,7 @@ async function loadWorkoutHistory() {
             }
         }
 
+        renderWorkoutContext(logs);
         if (logs.length === 0) {
             tableBody.innerHTML = `
                 <tr>
@@ -356,13 +435,13 @@ async function loadWorkoutHistory() {
 
         tableBody.innerHTML = logs.map(log => `
             <tr>
-                <td style="color:#666;">${formatDate(isLoggedIn ? log.date.split(" ")[0] : log.date.split("T")[0])}</td>
-                <td style="color:#fff;">${log.exercise_name.toUpperCase()}</td>
-                <td style="color:#666;">${log.workout_type.toUpperCase()}</td>
-                <td>${log.sets}</td>
-                <td>${log.reps}</td>
+                <td data-label="DATE" style="color:#a8adb8;">${formatDate(isLoggedIn ? log.date.split(" ")[0] : log.date.split("T")[0])}</td>
+                <td data-label="EXERCISE" style="color:#fff;">${log.exercise_name.toUpperCase()}</td>
+                <td data-label="TYPE" style="color:#a8adb8;">${log.workout_type.toUpperCase()}</td>
+                <td data-label="SETS">${log.sets}</td>
+                <td data-label="REPS">${log.reps}</td>
                 <td>${log.weight_added > 0 ? log.weight_added + ' KG' : '—'}</td>
-                <td style="text-align: right;">
+                <td data-label="DELETE" style="text-align: right;">
                     <button class="btn-delete" data-id="${log.id}">✕</button>
                 </td>
             </tr>
