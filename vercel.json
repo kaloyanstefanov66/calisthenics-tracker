@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/register",
+      "dest": "server.js"
+    },
+    {
+      "src": "/login",
+      "dest": "server.js"
+    },
+    {
+      "src": "/auth/google",
+      "dest": "server.js"
+    },
+    {
+      "src": "/exercises(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/logs(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/analytics(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
+  ]
+}

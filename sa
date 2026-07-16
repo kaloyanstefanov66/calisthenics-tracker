@@ -1,0 +1,95 @@
+[33mcommit b014e92f9fc0121bb716bd60a6f6de0761b66fe2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Wed Jul 8 18:39:42 2026 +0300
+
+    Minor extra code cleanup
+
+[33mcommit fe42d0d098dd4602a022892b55c7396c4fce22b2[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Mon Jun 22 20:52:54 2026 +0300
+
+    Flashing login screen fix
+
+[33mcommit c3167f59f5055c26d1c2d144bc169688f71443ce[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Mon Jun 22 20:49:58 2026 +0300
+
+    Changed dates format
+
+[33mcommit c4b732ddda624e01d7c57dfaf73dc6fbbe635d40[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Mon Jun 22 20:40:26 2026 +0300
+
+    Removed a line in the start
+
+[33mcommit 9d05514863f486f855af62921145a8187fc77e3a[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Sun Jun 21 00:02:55 2026 +0300
+
+    index and app.js improvements
+
+[33mcommit d4b1a46a8265041ee0c95351f410930b0e427aaf[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Sat Jun 20 15:55:41 2026 +0300
+
+    improved app.js
+
+[33mcommit c77e185aaea642eaf3b459c343b519ec1a09a48d[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Sat Jun 20 15:53:26 2026 +0300
+
+    backend improvements
+
+[33mcommit 03edd6f6a8ed858e66380f9ac84bdbabdf8a902c[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Fri Jun 19 20:54:57 2026 +0300
+
+    a
+
+[33mcommit 5e141aec97f3f98994d21616970dcf17ef1772a5[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Fri Jun 19 20:50:54 2026 +0300
+
+    fixed logs issue in backend
+
+[33mcommit 33083f299710ff0b24e76a5b40a4c3896089bc14[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Thu Jun 18 21:22:48 2026 +0300
+
+    fix: explicitly allow DELETE methods in vercel routing
+
+[33mcommit c281dd34bd5fe200c38d1f0e241b22423721dc76[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Thu Jun 18 20:46:15 2026 +0300
+
+    fix: whitelist live vercel frontend in CORS origins
+
+[33mcommit 836ec230af0024bab08397187d93046f497220f7[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Thu Jun 18 20:37:01 2026 +0300
+
+    chore: map frontend configuration to production backend
+
+[33mcommit 0295558e80cc17e976a6d6544cb702b2039b07aa[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Thu Jun 18 20:34:51 2026 +0300
+
+    feat: add production requirements file
+
+[33mcommit dc99bbb50d02eb48597aeb959e44b46452b49a49[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Thu Jun 18 20:28:49 2026 +0300
+
+    chore: add vercel deployment config
+
+[33mcommit 86b8b8f6adc20ed03972de4e28bf38459e6460c6[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Thu Jun 18 18:55:00 2026 +0300
+
+    pushed database to neon cloud
+
+[33mcommit d6da385c807567c0c372df882ab685d8597e9cca[m
+Author: kaloyanstefanov66 <kaloyanstefanov6@gmail.com>
+Date:   Wed Jun 17 17:12:48 2026 +0300
+
+    Initial commit (secured repository infrastructure)
