@@ -300,6 +300,23 @@
         </div>
     </div>
 
+    <div id="chat-widget">
+        <button id="chat-toggle-btn" aria-label="Open AI coach chat" aria-expanded="false">
+            <span id="chat-toggle-icon">💬</span>
+        </button>
+        <div id="chat-panel" class="hidden">
+            <div id="chat-header">
+                <span>AI COACH</span>
+                <button id="chat-close-btn" aria-label="Close chat">&times;</button>
+            </div>
+            <div id="chat-messages"></div>
+            <form id="chat-form" autocomplete="off">
+                <input id="chat-input" type="text" placeholder="Ask about your training..." maxlength="500" />
+                <button type="submit" id="chat-send-btn" aria-label="Send message">➤</button>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
