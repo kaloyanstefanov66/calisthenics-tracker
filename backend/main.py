@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from pydantic import BaseModel, EmailStr
 import os
+import requests
 from dotenv import load_dotenv
 
 
@@ -65,6 +66,13 @@ class ExerciseCreate(BaseModel):
     category: str
     workout_type: str
 
+class ChatMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage]
+
 # ---- AUTH DEPENDENCIES ----
 
 def get_current_user(access_token: str = Cookie(None)):
@@ -93,6 +101,47 @@ def get_admin_user(
     if not user or not user[0]:
         raise HTTPException(status_code=403, detail="Access Denied: Admin privileges required")
     return current_user_id
+
+# ---- AI COACH CONTEXT BUILDER ----
+
+def build_user_training_context(db: Session, user_id: int) -> str:
+    """
+    Pulls the requesting user's OWN recent logs and the app's exercise list,
+    then turns them into a short, structured text block for the LLM.
+    The LLM never queries the database directly — it only ever sees this
+    pre-fetched, already-scoped-to-this-user summary.
+    """
+    logs = db.execute(
+        text("""
+            SELECT e.name, e.workout_type, wl.sets, wl.reps, wl.weight_added, wl.workout_date
+            FROM workout_logs wl
+            JOIN exercises e ON wl.exercise_id = e.id
+            WHERE wl.user_id = :uid
+            ORDER BY wl.workout_date DESC
+            LIMIT 25
+        """),
+        {"uid": user_id}
+    ).fetchall()
+
+    exercise_rows = db.execute(
+        text("SELECT DISTINCT name, workout_type FROM exercises ORDER BY workout_type, name")
+    ).fetchall()
+    exercise_list = ", ".join(f"{row[0]} ({row[1]})" for row in exercise_rows) or "none logged yet"
+
+    if not logs:
+        log_summary = "This user has no logged workouts yet."
+    else:
+        lines = []
+        for row in logs:
+            name, wtype, sets, reps, weight, date = row
+            weight_part = f" @ {weight}kg" if weight else ""
+            lines.append(f"- {date}: {name} ({wtype}) — {sets} sets x {reps} reps{weight_part}")
+        log_summary = "Recent logs, most recent first:\n" + "\n".join(lines)
+
+    return (
+        f"{log_summary}\n\n"
+        f"Exercises that exist in this app's database (only ever recommend from this list): {exercise_list}"
+    )
 
 # ---- ENDPOINTS ----
 
@@ -314,6 +363,56 @@ def get_user_logs(
         }
         for row in result
     ]
+
+@app.post("/chat")
+@limiter.limit("15/minute")
+def chat_with_coach(
+    request: Request,
+    chat_data: ChatRequest,
+    db: Session = Depends(database.get_db),
+    current_user_id: int = Depends(get_current_user)
+):
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    if not GROQ_API_KEY:
+        raise HTTPException(status_code=500, detail="AI coach is not configured on the server")
+
+    user_context = build_user_training_context(db, current_user_id)
+
+    system_prompt = (
+        "You are a friendly, knowledgeable strength and calisthenics coach embedded in a "
+        "workout-tracking app. Give concise, structured, practical advice — use short bullet "
+        "points or a numbered sets x reps scheme when suggesting a workout. Base every "
+        "suggestion strictly on the user's real logged history below, and only ever recommend "
+        "exercises that appear in the app's exercise list. Never invent data the user hasn't "
+        "logged, and never claim to see information beyond what's given here. Keep replies under "
+        "roughly 180 words unless the user explicitly asks for more detail.\n\n"
+        f"{user_context}"
+    )
+
+    # Cap history sent to the model to control token usage on the free tier
+    trimmed_history = chat_data.messages[-8:]
+    payload_messages = [{"role": "system", "content": system_prompt}] + [
+        {"role": m.role, "content": m.content} for m in trimmed_history
+    ]
+
+    try:
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": payload_messages,
+                "temperature": 0.6,
+                "max_tokens": 500,
+            },
+            timeout=20,
+        )
+        response.raise_for_status()
+        reply = response.json()["choices"][0]["message"]["content"]
+    except requests.exceptions.RequestException:
+        raise HTTPException(status_code=503, detail="The coach is temporarily unavailable. Try again shortly.")
+
+    return {"reply": reply}
 
 @app.delete("/logs/{log_id}")
 def delete_workout_log(
