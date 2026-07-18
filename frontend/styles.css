@@ -418,7 +418,10 @@ tr:hover td { color: #aaa; }
     flex-direction: column;
     gap: 15px;
     z-index: 9999;
+    pointer-events: none;
 }
+
+#toast-container .toast { pointer-events: auto; }
 
 .toast {
     background: rgba(20, 20, 25, 0.85);
@@ -1181,7 +1184,7 @@ th { color: #aeb8b1; } td { border-color: #2d3832; }
 }
 
 /* ---- 10. AI COACH CHAT WIDGET ---- */
-#chat-widget { position: fixed; right: 20px; bottom: 20px; z-index: 999; font-family: 'Montserrat', sans-serif; }
+#chat-widget { position: fixed; right: 20px; bottom: 20px; z-index: 10001; font-family: 'Montserrat', sans-serif; }
 
 #chat-toggle-btn {
     width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--line);
@@ -1232,3 +1235,57 @@ th { color: #aeb8b1; } td { border-color: #2d3832; }
 @media (max-width: 480px) {
     #chat-panel { width: calc(100vw - 32px); height: 65vh; }
 }
+/* ---- 11. PROGRESS TAB — GROUPED-BY-DAY LOG ---- */
+.log-days { display: flex; flex-direction: column; gap: 18px; }
+
+.log-empty {
+    text-align: center; color: var(--muted); opacity: .6; padding: 48px 0;
+    font-size: 13px; letter-spacing: 1px; font-weight: 600;
+}
+
+.log-day {
+    background: rgba(20, 26, 24, .96); border: 1px solid var(--line);
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0,0,0,.22);
+}
+
+.log-day-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 20px; background: rgba(255,255,255,.03); border-bottom: 1px solid var(--line);
+}
+.log-day-title { display: flex; align-items: baseline; gap: 10px; }
+.log-day-date { color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: .5px; }
+.log-day-weekday { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; }
+.log-day-meta { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; }
+
+.log-day-entries { display: flex; flex-direction: column; }
+
+.log-entry {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px; border-bottom: 1px solid var(--line); transition: background .15s ease;
+}
+.log-entry:last-child { border-bottom: none; }
+.log-entry:hover { background: rgba(255,255,255,.025); }
+
+.log-entry-main { flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.log-entry-name { color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .3px; }
+.log-entry-type { color: var(--muted); font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; }
+
+.log-entry-stats {
+    flex: 0 0 auto;
+    display: grid; grid-template-columns: 64px 64px 74px; gap: 4px;
+    color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .4px;
+}
+.log-entry-stats span { text-align: right; white-space: nowrap; }
+
+.log-entry .btn-delete { flex: 0 0 auto; }
+
+@media (max-width: 640px) {
+    .log-day-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .log-entry { flex-wrap: wrap; row-gap: 8px; }
+    .log-entry-stats { grid-template-columns: 52px 52px 60px; gap: 2px; font-size: 10px; }
+}
+
+/* ---- 12. AI COACH ICON REFRESH (match site accent language) ---- */
+#chat-toggle-btn { display: flex; align-items: center; justify-content: center; }
+#chat-header { letter-spacing: 1.8px; }

@@ -244,20 +244,7 @@
                 </div>
 
                 <div class="table-wrapper" style="margin-top: 0;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>DATE</th>
-                                <th>EXERCISE</th>
-                                <th>TYPE</th>
-                                <th>SETS</th>
-                                <th>REPS</th>
-                                <th>WEIGHT</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-table-body"></tbody>
-                    </table>
+                    <div id="history-table-body" class="log-days"></div>
                 </div>
             </section>
 
@@ -302,17 +289,26 @@
 
     <div id="chat-widget">
         <button id="chat-toggle-btn" aria-label="Open AI coach chat" aria-expanded="false">
-            <span id="chat-toggle-icon">💬</span>
+            <svg id="chat-toggle-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 5.5C4 4.67157 4.67157 4 5.5 4H18.5C19.3284 4 20 4.67157 20 5.5V15.5C20 16.3284 19.3284 17 18.5 17H9L5 20.5V17H5.5C4.67157 17 4 16.3284 4 15.5V5.5Z" stroke="#15200d" stroke-width="1.6" stroke-linejoin="round"/>
+                <circle cx="8.5" cy="10.25" r="1" fill="#15200d"/>
+                <circle cx="12" cy="10.25" r="1" fill="#15200d"/>
+                <circle cx="15.5" cy="10.25" r="1" fill="#15200d"/>
+            </svg>
         </button>
         <div id="chat-panel" class="hidden">
             <div id="chat-header">
-                <span>AI COACH</span>
+                <span class="eyebrow" style="margin:0;">AI COACH</span>
                 <button id="chat-close-btn" aria-label="Close chat">&times;</button>
             </div>
             <div id="chat-messages"></div>
             <form id="chat-form" autocomplete="off">
                 <input id="chat-input" type="text" placeholder="Ask about your training..." maxlength="500" />
-                <button type="submit" id="chat-send-btn" aria-label="Send message">➤</button>
+                <button type="submit" id="chat-send-btn" aria-label="Send message">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 20L20 12L4 4V10L15 12L4 14V20Z" fill="#15200d"/>
+                    </svg>
+                </button>
             </form>
         </div>
     </div>

@@ -433,27 +433,49 @@ async function loadWorkoutHistory() {
         renderWorkoutContext(logs);
         if (logs.length === 0) {
             tableBody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; color: #444; padding: 40px 0; font-size: 13px; letter-spacing: 1px;">
-                        NO SETS LOGGED YET — PICK AN EXERCISE ABOVE TO GET STARTED
-                    </td>
-                </tr>`;
+                <div class="log-empty">NO SETS LOGGED YET — PICK AN EXERCISE ABOVE TO GET STARTED</div>`;
             return;
         }
 
-        tableBody.innerHTML = logs.map(log => `
-            <tr>
-                <td data-label="DATE" style="color:#a8adb8;">${formatDate(isLoggedIn ? log.date.split(" ")[0] : log.date.split("T")[0])}</td>
-                <td data-label="EXERCISE" style="color:#fff;">${log.exercise_name.toUpperCase()}</td>
-                <td data-label="TYPE" style="color:#a8adb8;">${log.workout_type.toUpperCase()}</td>
-                <td data-label="SETS">${log.sets}</td>
-                <td data-label="REPS">${log.reps}</td>
-                <td>${log.weight_added > 0 ? log.weight_added + ' KG' : '—'}</td>
-                <td data-label="DELETE" style="text-align: right;">
-                    <button class="btn-delete" data-id="${log.id}">✕</button>
-                </td>
-            </tr>
-        `).join("");
+        // Group logs by calendar day, preserving the newest-first order they arrived in
+        const dayGroups = new Map();
+        logs.forEach(log => {
+            const dateKey = isLoggedIn ? log.date.split(" ")[0] : log.date.split("T")[0];
+            if (!dayGroups.has(dateKey)) dayGroups.set(dateKey, []);
+            dayGroups.get(dateKey).push(log);
+        });
+
+        tableBody.innerHTML = [...dayGroups.entries()].map(([dateKey, dayLogs]) => {
+            const totalSets = dayLogs.reduce((sum, l) => sum + Number(l.sets || 0), 0);
+            const weekday = new Date(dateKey + "T00:00:00").toLocaleDateString('en-US', { weekday: 'long' });
+            const entriesHtml = dayLogs.map(log => `
+                <div class="log-entry">
+                    <div class="log-entry-main">
+                        <span class="log-entry-name">${log.exercise_name.toUpperCase()}</span>
+                        <span class="log-entry-type">${log.workout_type.toUpperCase()}</span>
+                    </div>
+                    <div class="log-entry-stats">
+                        <span>${log.sets} SETS</span>
+                        <span>${log.reps} REPS</span>
+                        <span>${log.weight_added > 0 ? log.weight_added + ' KG' : 'BODYWEIGHT'}</span>
+                    </div>
+                    <button class="btn-delete" data-id="${log.id}" aria-label="Delete set">✕</button>
+                </div>
+            `).join("");
+
+            return `
+                <div class="log-day">
+                    <div class="log-day-header">
+                        <div class="log-day-title">
+                            <span class="log-day-date">${formatDate(dateKey)}</span>
+                            <span class="log-day-weekday">${weekday}</span>
+                        </div>
+                        <span class="log-day-meta">${dayLogs.length} EXERCISE${dayLogs.length > 1 ? 'S' : ''} · ${totalSets} SETS</span>
+                    </div>
+                    <div class="log-day-entries">${entriesHtml}</div>
+                </div>
+            `;
+        }).join("");
     } catch (err) {
         showToast("Could not load training history.", "error");
         console.error(err);
@@ -753,6 +775,93 @@ async function verifySession() {
     } catch (err) {
         console.error("Could not verify session with server.");
     }
+}
+
+// ---- 10. AI COACH CHAT WIDGET ----
+const chatToggleBtn = document.getElementById("chat-toggle-btn");
+const chatPanel = document.getElementById("chat-panel");
+const chatCloseBtn = document.getElementById("chat-close-btn");
+const chatForm = document.getElementById("chat-form");
+const chatInput = document.getElementById("chat-input");
+const chatMessagesEl = document.getElementById("chat-messages");
+
+let chatHistory = [];
+
+function appendChatBubble(role, message) {
+    const bubble = document.createElement("div");
+    bubble.className = `chat-bubble ${role}`;
+    bubble.textContent = message;
+    chatMessagesEl.appendChild(bubble);
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    return bubble;
+}
+
+if (chatToggleBtn) {
+    chatToggleBtn.addEventListener("click", () => {
+        const willOpen = chatPanel.classList.contains("hidden");
+        chatPanel.classList.toggle("hidden");
+        chatToggleBtn.setAttribute("aria-expanded", willOpen);
+        if (willOpen) {
+            if (chatMessagesEl.children.length === 0) {
+                appendChatBubble("assistant", isLoggedIn
+                    ? "Hey! I can see your logged workouts — ask me anything about your training, progress, or what to do next."
+                    : "Hi! Sign in first so I can look at your workout history and give you tailored advice.");
+            }
+            chatInput.focus();
+        }
+    });
+}
+
+if (chatCloseBtn) {
+    chatCloseBtn.addEventListener("click", () => {
+        chatPanel.classList.add("hidden");
+        chatToggleBtn.setAttribute("aria-expanded", "false");
+    });
+}
+
+if (chatForm) {
+    chatForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        if (!isLoggedIn) {
+            showToast("Sign in to chat with your AI coach.", "error");
+            return;
+        }
+
+        appendChatBubble("user", message);
+        chatHistory.push({ role: "user", content: message });
+        chatInput.value = "";
+        chatInput.disabled = true;
+
+        const thinkingBubble = appendChatBubble("assistant", "Thinking...");
+
+        try {
+            const response = await fetch(`${API_URL}/chat`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ messages: chatHistory })
+            });
+            if (!response.ok) {
+                if (response.status === 429) throw new Error("Slow down a little — try again in a minute.");
+                if (response.status === 401) throw new Error("Session expired. Please sign in again.");
+                throw new Error("The coach couldn't respond. Please try again.");
+            }
+            const data = await response.json();
+            thinkingBubble.textContent = data.reply;
+            chatHistory.push({ role: "assistant", content: data.reply });
+            if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
+        } catch (err) {
+            thinkingBubble.textContent = err.message;
+            thinkingBubble.classList.add("chat-error");
+        } finally {
+            chatInput.disabled = false;
+            chatInput.focus();
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        }
+    });
 }
 
 // ---- BOOT SEQUENCE ----
