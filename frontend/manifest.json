@@ -1,0 +1,15 @@
+{
+  "name": "APEX — Calisthenics & Gym Tracker",
+  "short_name": "APEX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1010",
+  "theme_color": "#0c1010",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
