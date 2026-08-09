@@ -57,6 +57,14 @@ class WorkoutLogCreate(BaseModel):
     sets: int
     reps: int
     weight_added: float = 0.0
+    workout_date: str = None  # optional YYYY-MM-DD string
+
+class WorkoutLogUpdate(BaseModel):
+    sets: int
+    reps: int
+    weight_added: float = 0.0
+    workout_date: str = None
+
 
 class GoogleAuthToken(BaseModel):
     token: str
@@ -147,14 +155,15 @@ def build_user_training_context(db: Session, user_id: int) -> str:
 
 @app.get("/analytics", response_model=AnalyticsResponse)
 def get_analytics(
+    days: int = 7,
     db: Session = Depends(database.get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-  
+    days_bounded = min(max(days, 7), 365)
     query = text("""
         WITH date_series AS (
             SELECT generate_series(
-                CURRENT_DATE - INTERVAL '6 days',
+                CURRENT_DATE - (:days_offset || ' days')::INTERVAL,
                 CURRENT_DATE,
                 INTERVAL '1 day'
             )::DATE AS log_date
@@ -165,7 +174,7 @@ def get_analytics(
                 SUM(sets * reps * CASE WHEN COALESCE(weight_added, 0) > 0 THEN weight_added ELSE 1 END) AS total_volume
             FROM workout_logs
             WHERE user_id = :user_id
-              AND workout_date >= CURRENT_DATE - INTERVAL '6 days'
+              AND workout_date >= CURRENT_DATE - (:days_offset || ' days')::INTERVAL
             GROUP BY CAST(workout_date AS DATE)
         )
         SELECT ds.log_date, COALESCE(dv.total_volume, 0) AS total_volume
@@ -173,10 +182,11 @@ def get_analytics(
         LEFT JOIN daily_volume dv ON ds.log_date = dv.log_date
         ORDER BY ds.log_date ASC;
     """)
-    result = db.execute(query, {"user_id": current_user_id}).fetchall()
+    result = db.execute(query, {"user_id": current_user_id, "days_offset": days_bounded - 1}).fetchall()
     labels = [str(row[0]) for row in result]
     volume = [float(row[1]) for row in result]
     return {"labels": labels, "volume": volume}
+
 
 @app.post("/register")
 def register_user(user_data: UserRegister, db: Session = Depends(database.get_db)):
@@ -313,21 +323,38 @@ def create_workout_log(
     db: Session = Depends(database.get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-    db.execute(
-        text("""
-            INSERT INTO workout_logs (user_id, exercise_id, sets, reps, weight_added)
-            VALUES (:uid, :eid, :sets, :reps, :weight)
-        """),
-        {
-            "uid": current_user_id,
-            "eid": log_data.exercise_id,
-            "sets": log_data.sets,
-            "reps": log_data.reps,
-            "weight": log_data.weight_added
-        }
-    )
+    if log_data.workout_date:
+        db.execute(
+            text("""
+                INSERT INTO workout_logs (user_id, exercise_id, sets, reps, weight_added, workout_date)
+                VALUES (:uid, :eid, :sets, :reps, :weight, :wdate::timestamp)
+            """),
+            {
+                "uid": current_user_id,
+                "eid": log_data.exercise_id,
+                "sets": log_data.sets,
+                "reps": log_data.reps,
+                "weight": log_data.weight_added,
+                "wdate": log_data.workout_date
+            }
+        )
+    else:
+        db.execute(
+            text("""
+                INSERT INTO workout_logs (user_id, exercise_id, sets, reps, weight_added)
+                VALUES (:uid, :eid, :sets, :reps, :weight)
+            """),
+            {
+                "uid": current_user_id,
+                "eid": log_data.exercise_id,
+                "sets": log_data.sets,
+                "reps": log_data.reps,
+                "weight": log_data.weight_added
+            }
+        )
     db.commit()
     return {"message": "Workout log saved successfully!"}
+
 
 @app.get("/logs")
 def get_user_logs(
@@ -414,6 +441,69 @@ def chat_with_coach(
 
     return {"reply": reply}
 
+@app.put("/logs/{log_id}")
+def update_workout_log(
+    log_id: int,
+    log_data: WorkoutLogUpdate,
+    db: Session = Depends(database.get_db),
+    current_user_id: int = Depends(get_current_user)
+):
+    log = db.execute(
+        text("SELECT id FROM workout_logs WHERE id = :lid AND user_id = :uid"),
+        {"lid": log_id, "uid": current_user_id}
+    ).fetchone()
+    if not log:
+        raise HTTPException(status_code=404, detail="Workout log not found or unauthorized")
+
+    if log_data.workout_date:
+        db.execute(
+            text("""
+                UPDATE workout_logs
+                SET sets = :sets, reps = :reps, weight_added = :weight, workout_date = :wdate::timestamp
+                WHERE id = :lid AND user_id = :uid
+            """),
+            {
+                "lid": log_id,
+                "uid": current_user_id,
+                "sets": log_data.sets,
+                "reps": log_data.reps,
+                "weight": log_data.weight_added,
+                "wdate": log_data.workout_date
+            }
+        )
+    else:
+        db.execute(
+            text("""
+                UPDATE workout_logs
+                SET sets = :sets, reps = :reps, weight_added = :weight
+                WHERE id = :lid AND user_id = :uid
+            """),
+            {
+                "lid": log_id,
+                "uid": current_user_id,
+                "sets": log_data.sets,
+                "reps": log_data.reps,
+                "weight": log_data.weight_added
+            }
+        )
+    db.commit()
+    return {"message": "Log updated successfully"}
+
+@app.get("/logs/prs")
+def get_user_prs(
+    db: Session = Depends(database.get_db),
+    current_user_id: int = Depends(get_current_user)
+):
+    query = text("""
+        SELECT e.name, e.workout_type, MAX(wl.weight_added) as max_weight, MAX(wl.sets * wl.reps) as max_reps_volume
+        FROM workout_logs wl
+        JOIN exercises e ON wl.exercise_id = e.id
+        WHERE wl.user_id = :uid
+        GROUP BY e.id, e.name, e.workout_type
+    """)
+    rows = db.execute(query, {"uid": current_user_id}).fetchall()
+    return [{"exercise_name": row[0], "workout_type": row[1], "max_weight": float(row[2]), "max_reps_volume": int(row[3])} for row in rows]
+
 @app.delete("/logs/{log_id}")
 def delete_workout_log(
     log_id: int,
@@ -431,4 +521,4 @@ def delete_workout_log(
         {"lid": log_id}
     )
     db.commit()
-    return {"message": "Log deleted successfully"}
+    return {"message": "Log deleted successfully"}
